@@ -17,7 +17,7 @@ public class Empleado implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer empno;
 	private Departamento dept;
-	private Empleado emp;
+	private Empleado jefe;
 	private String ename;
 	private String job;
 	private Date hiredate;
@@ -29,10 +29,10 @@ public class Empleado implements java.io.Serializable {
 	public Empleado() {
 	}
 
-	public Empleado(Departamento dept, Empleado emp, String ename, String job, Date hiredate, BigDecimal sal, BigDecimal comm,
+	public Empleado(Departamento dept, Empleado jefe, String ename, String job, Date hiredate, BigDecimal sal, BigDecimal comm,
 			Set accounts, Set suborninado) {
 		this.dept = dept;
-		this.emp = emp;
+		this.jefe = jefe;
 		this.ename = ename;
 		this.job = job;
 		this.hiredate = hiredate;
@@ -59,11 +59,11 @@ public class Empleado implements java.io.Serializable {
 	}
 
 	public Empleado getEmp() {
-		return this.emp;
+		return this.jefe;
 	}
 
 	public void setEmp(Empleado emp) {
-		this.emp = emp;
+		this.jefe = jefe;
 	}
 
 	public String getEname() {
