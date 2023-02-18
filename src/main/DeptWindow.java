@@ -25,6 +25,8 @@ import javax.swing.event.ListSelectionListener;
 import modelo.Departamento;
 import modelo.servicio.DepartamentoServicio;
 import modelo.servicio.IDepartamentoServicio;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
 
 public class DeptWindow extends JFrame {
 
@@ -40,8 +42,9 @@ public class DeptWindow extends JFrame {
 
 	private IDepartamentoServicio departamentoServicio;
 	private CreateNewDeptDialog createDialog;
-	private JButton btnModificarDepartamento;
-	private JButton btnEliminarDepartamento;
+	private JButton btnModificarImporteCuenta;
+	private JButton btnEliminarCuenta;
+	private JTextField txtIdEmpleado;
 
 	/**
 	 * Launch the application.
@@ -75,28 +78,28 @@ public class DeptWindow extends JFrame {
 		contentPane.setLayout(null);
 
 		JPanel panel = new JPanel();
-		panel.setBounds(8, 8, 821, 500);
+		panel.setBounds(8, 8, 821, 714);
 		contentPane.add(panel);
 		panel.setLayout(null);
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(19, 264, 669, 228);
+		scrollPane.setBounds(10, 475, 669, 228);
 		panel.add(scrollPane);
+		
+				mensajes_text_Area = new JTextArea();
+				scrollPane.setViewportView(mensajes_text_Area);
+				mensajes_text_Area.setEditable(false);
+				mensajes_text_Area.setText("Panel de mensajes");
+				mensajes_text_Area.setForeground(new Color(255, 0, 0));
+				mensajes_text_Area.setFont(new Font("Monospaced", Font.PLAIN, 13));
 
-		mensajes_text_Area = new JTextArea();
-		scrollPane.setViewportView(mensajes_text_Area);
-		mensajes_text_Area.setEditable(false);
-		mensajes_text_Area.setText("Panel de mensajes");
-		mensajes_text_Area.setForeground(new Color(255, 0, 0));
-		mensajes_text_Area.setFont(new Font("Monospaced", Font.PLAIN, 13));
+		JButton btnShowAllAccounts = new JButton("Mostrar cuentas");
 
-		JButton btnShowAllDepts = new JButton("Mostrar departamentos");
+		btnShowAllAccounts.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		btnShowAllAccounts.setBounds(49, 148, 208, 36);
+		panel.add(btnShowAllAccounts);
 
-		btnShowAllDepts.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnShowAllDepts.setBounds(50, 37, 208, 36);
-		panel.add(btnShowAllDepts);
-
-		btnModificarDepartamento = new JButton("Modificar departamento");
+		btnModificarImporteCuenta = new JButton("Modificar importe cuenta");
 
 		JListAllDepts = new JList<Departamento>();
 
@@ -106,29 +109,40 @@ public class DeptWindow extends JFrame {
 		JListAllDepts.setBounds(403, 37, 377, 200);
 
 		JScrollPane scrollPanel_in_JlistAllDepts = new JScrollPane(JListAllDepts);
-		scrollPanel_in_JlistAllDepts.setLocation(300, 0);
-		scrollPanel_in_JlistAllDepts.setSize(500, 250);
+		scrollPanel_in_JlistAllDepts.setLocation(300, 34);
+		scrollPanel_in_JlistAllDepts.setSize(500, 382);
 		
 		panel.add(scrollPanel_in_JlistAllDepts);
 	
 
-		JButton btnCrearNuevoDepartamento = new JButton("Crear nuevo departamento");
+		JButton btnCrearNuevaCuenta = new JButton("Crear nueva cuenta");
 
-		btnCrearNuevoDepartamento.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnCrearNuevoDepartamento.setBounds(50, 85, 208, 36);
-		panel.add(btnCrearNuevoDepartamento);
+		btnCrearNuevaCuenta.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		btnCrearNuevaCuenta.setBounds(49, 218, 208, 36);
+		panel.add(btnCrearNuevaCuenta);
 
-		btnModificarDepartamento.setEnabled(false);
-		btnModificarDepartamento.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnModificarDepartamento.setBounds(50, 139, 208, 36);
-		panel.add(btnModificarDepartamento);
+		btnModificarImporteCuenta.setEnabled(false);
+		btnModificarImporteCuenta.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		btnModificarImporteCuenta.setBounds(49, 295, 208, 36);
+		panel.add(btnModificarImporteCuenta);
 
-		btnEliminarDepartamento = new JButton("Eliminar departamento");
+		btnEliminarCuenta = new JButton("Eliminar cuenta");
 
-		btnEliminarDepartamento.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnEliminarDepartamento.setEnabled(false);
-		btnEliminarDepartamento.setBounds(50, 201, 208, 36);
-		panel.add(btnEliminarDepartamento);
+		btnEliminarCuenta.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		btnEliminarCuenta.setEnabled(false);
+		btnEliminarCuenta.setBounds(49, 380, 208, 36);
+		panel.add(btnEliminarCuenta);
+		
+		JLabel lblIntrodEmp = new JLabel("Introduzca el nº de empleado");
+		lblIntrodEmp.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblIntrodEmp.setBounds(49, 36, 197, 36);
+		panel.add(lblIntrodEmp);
+		
+		txtIdEmpleado = new JTextField();
+		txtIdEmpleado.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		txtIdEmpleado.setBounds(49, 80, 138, 41);
+		panel.add(txtIdEmpleado);
+		txtIdEmpleado.setColumns(10);
 
 		// Eventos
 		ActionListener showAllDepartamentosActionListener = new ActionListener() {
@@ -136,7 +150,7 @@ public class DeptWindow extends JFrame {
 				getAllDepartamentos();
 			}
 		};
-		btnShowAllDepts.addActionListener(showAllDepartamentosActionListener);
+		btnShowAllAccounts.addActionListener(showAllDepartamentosActionListener);
 
 		ActionListener crearListener = new ActionListener() {
 
@@ -148,7 +162,7 @@ public class DeptWindow extends JFrame {
 				showDialog();
 			}
 		};
-		btnCrearNuevoDepartamento.addActionListener(crearListener);
+		btnCrearNuevaCuenta.addActionListener(crearListener);
 
 		ActionListener modificarListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -167,14 +181,14 @@ public class DeptWindow extends JFrame {
 			}
 		};
 
-		btnModificarDepartamento.addActionListener(modificarListener);
+		btnModificarImporteCuenta.addActionListener(modificarListener);
 
 		ListSelectionListener selectionListListener = new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if (e.getValueIsAdjusting() == false) {
 					int selectedIx = JListAllDepts.getSelectedIndex();
-					btnModificarDepartamento.setEnabled((selectedIx > -1));
-					btnEliminarDepartamento.setEnabled((selectedIx > -1));
+					btnModificarImporteCuenta.setEnabled((selectedIx > -1));
+					btnEliminarCuenta.setEnabled((selectedIx > -1));
 					if (selectedIx > -1) {
 						Departamento d = (Departamento) DeptWindow.this.JListAllDepts.getModel().getElementAt(selectedIx);
 						if (d != null) {
@@ -210,7 +224,7 @@ public class DeptWindow extends JFrame {
 				}
 			}
 		};
-		btnEliminarDepartamento.addActionListener(deleteListener);
+		btnEliminarCuenta.addActionListener(deleteListener);
 	}
 
 	private void addMensaje(boolean keepText, String msg) {
@@ -258,5 +272,4 @@ public class DeptWindow extends JFrame {
 		JListAllDepts.setModel(defModel);
 
 	}
-
 }
