@@ -22,11 +22,18 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import exceptions.InstanceNotFoundException;
 import modelo.Departamento;
+import modelo.Empleado;
 import modelo.servicio.DepartamentoServicio;
+import modelo.servicio.IEmpleadoServicio;
+import modelo.servicio.EmpleadoServicio;
 import modelo.servicio.IDepartamentoServicio;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class DeptWindow extends JFrame {
 
@@ -45,6 +52,10 @@ public class DeptWindow extends JFrame {
 	private JButton btnModificarImporteCuenta;
 	private JButton btnEliminarCuenta;
 	private JTextField txtIdEmpleado;
+	
+	
+	//Se crea un objeto IEmpleadoServicio
+	private IEmpleadoServicio empleadoServicio;
 
 	/**
 	 * Launch the application.
@@ -68,6 +79,9 @@ public class DeptWindow extends JFrame {
 	public DeptWindow() {
 
 		departamentoServicio = new DepartamentoServicio();
+		
+		//Se crea un objeto EmpleadoServicio
+		empleadoServicio = new EmpleadoServicio();
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 847, 772);
@@ -139,6 +153,43 @@ public class DeptWindow extends JFrame {
 		panel.add(lblIntrodEmp);
 		
 		txtIdEmpleado = new JTextField();
+		txtIdEmpleado.addKeyListener(new KeyAdapter() {
+			
+			//Acción al pulsar la tecla enter
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode()==KeyEvent.VK_ENTER){
+					int idEmpIntroducido = 0;
+					String IdIntroducido = ((JTextField) e.getSource()).getText().trim();
+					try {
+						idEmpIntroducido = Integer.parseInt(IdIntroducido);
+						Empleado empleado = empleadoServicio.findEmpById(idEmpIntroducido);
+						//Si el empleado existe
+						if (empleado.getEmpno() == idEmpIntroducido) {
+							addMensaje(true, "El empleado " + idEmpIntroducido + " existe en la BBDD");
+						} 
+						//Si el empleado no existe, entra en el catch (InstanceNotFoundException)
+					} catch (NumberFormatException nfe) {
+
+						addMensaje(true, "Introduzca un número entero");
+						txtIdEmpleado.setText("");
+
+					} catch (InstanceNotFoundException infe) {
+
+						addMensaje(true, "El empleado: " + idEmpIntroducido + " no existe");
+					} catch (Exception ex) {
+						System.out.println("Ha ocurrido una excepción: " + ex.getMessage());
+						addMensaje(true, "Ha ocurrido un error y no se ha podido recuperar el empleado con id: "
+								+ idEmpIntroducido);
+
+					}
+					//Se limpia el txtField
+					txtIdEmpleado.setText("");
+				} 
+				
+			}
+		});
+		txtIdEmpleado.setHorizontalAlignment(SwingConstants.CENTER);
 		txtIdEmpleado.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		txtIdEmpleado.setBounds(49, 80, 138, 41);
 		panel.add(txtIdEmpleado);
@@ -226,7 +277,7 @@ public class DeptWindow extends JFrame {
 		};
 		btnEliminarCuenta.addActionListener(deleteListener);
 	}
-
+	
 	private void addMensaje(boolean keepText, String msg) {
 		String oldText = "";
 		if (keepText) {
