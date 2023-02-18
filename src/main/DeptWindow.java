@@ -23,6 +23,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import exceptions.InstanceNotFoundException;
+import modelo.Account;
 import modelo.Departamento;
 import modelo.Empleado;
 import modelo.servicio.DepartamentoServicio;
@@ -31,6 +32,7 @@ import modelo.servicio.EmpleadoServicio;
 import modelo.servicio.IDepartamentoServicio;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.ListModel;
 import javax.swing.SwingConstants;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -45,7 +47,8 @@ public class DeptWindow extends JFrame {
 	private JPanel contentPane;
 
 	private JTextArea mensajes_text_Area;
-	private JList<Departamento> JListAllDepts;
+	
+	private JList<Account> JListAllEmpAccounts;
 
 	private IDepartamentoServicio departamentoServicio;
 	private CreateNewDeptDialog createDialog;
@@ -115,14 +118,14 @@ public class DeptWindow extends JFrame {
 
 		btnModificarImporteCuenta = new JButton("Modificar importe cuenta");
 
-		JListAllDepts = new JList<Departamento>();
+		JListAllEmpAccounts = new JList<Account>();
 
-		JListAllDepts.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		JListAllEmpAccounts.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		
-		JListAllDepts.setBounds(403, 37, 377, 200);
+		JListAllEmpAccounts.setBounds(403, 37, 377, 200);
 
-		JScrollPane scrollPanel_in_JlistAllDepts = new JScrollPane(JListAllDepts);
+		JScrollPane scrollPanel_in_JlistAllDepts = new JScrollPane(JListAllEmpAccounts);
 		scrollPanel_in_JlistAllDepts.setLocation(300, 34);
 		scrollPanel_in_JlistAllDepts.setSize(500, 382);
 		
@@ -184,7 +187,7 @@ public class DeptWindow extends JFrame {
 
 					}
 					//Se limpia el txtField
-					txtIdEmpleado.setText("");
+					//txtIdEmpleado.setText("");
 				} 
 				
 			}
@@ -196,12 +199,29 @@ public class DeptWindow extends JFrame {
 		txtIdEmpleado.setColumns(10);
 
 		// Eventos
-		ActionListener showAllDepartamentosActionListener = new ActionListener() {
+		ActionListener btnShowAllAccountsActionListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				getAllDepartamentos();
+				int idEmpIntroducido = 0;
+				String IdIntroducido = txtIdEmpleado.getText().trim();
+				try {
+					idEmpIntroducido = Integer.parseInt(IdIntroducido);
+					getAllEmpAccounts(idEmpIntroducido);
+					
+				} catch (NumberFormatException nfe) {
+
+					addMensaje(true, "Introduzca un número entero");
+					txtIdEmpleado.setText("");
+
+				} catch (Exception ex) {
+					System.out.println("Ha ocurrido una excepción: " + ex.getMessage());
+					addMensaje(true, "Ha ocurrido un error y no se ha podido recuperar las cuentas con id: "
+							+ idEmpIntroducido);
+
+				}
+				
 			}
 		};
-		btnShowAllAccounts.addActionListener(showAllDepartamentosActionListener);
+		btnShowAllAccounts.addActionListener(btnShowAllAccountsActionListener);
 
 		ActionListener crearListener = new ActionListener() {
 
@@ -217,9 +237,9 @@ public class DeptWindow extends JFrame {
 
 		ActionListener modificarListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int selectedIx = JListAllDepts.getSelectedIndex();
+				/*int selectedIx = JListAllEmpAccounts.getSelectedIndex();
 				if (selectedIx > -1) {
-					Departamento departamento = (Departamento) JListAllDepts.getModel().getElementAt(selectedIx);
+					Departamento departamento = (Departamento) JListAllEmpAccounts.getModel().getElementAt(selectedIx);
 					if (departamento != null) {
 
 						JFrame owner = (JFrame) SwingUtilities.getRoot((Component) e.getSource());
@@ -228,7 +248,7 @@ public class DeptWindow extends JFrame {
 								Dialog.ModalityType.DOCUMENT_MODAL, departamento);
 						showDialog();
 					}
-				}
+				}*/
 			}
 		};
 
@@ -236,26 +256,26 @@ public class DeptWindow extends JFrame {
 
 		ListSelectionListener selectionListListener = new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
-				if (e.getValueIsAdjusting() == false) {
-					int selectedIx = JListAllDepts.getSelectedIndex();
+				/*if (e.getValueIsAdjusting() == false) {
+					int selectedIx = JListAllEmpAccounts.getSelectedIndex();
 					btnModificarImporteCuenta.setEnabled((selectedIx > -1));
 					btnEliminarCuenta.setEnabled((selectedIx > -1));
 					if (selectedIx > -1) {
-						Departamento d = (Departamento) DeptWindow.this.JListAllDepts.getModel().getElementAt(selectedIx);
+						Departamento d = (Departamento) DeptWindow.this.JListAllEmpAccounts.getModel().getElementAt(selectedIx);
 						if (d != null) {
 							addMensaje(true, "Se ha seleccionado el d: " + d);
 						}
 					}
-				}
+				}*/
 			}
 		};
-		JListAllDepts.addListSelectionListener(selectionListListener);
+		JListAllEmpAccounts.addListSelectionListener(selectionListListener);
 
 		ActionListener deleteListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int selectedIx = JListAllDepts.getSelectedIndex();
-				if (selectedIx > -1) {
-					Departamento d = (Departamento) JListAllDepts.getModel().getElementAt(selectedIx);
+				int selectedIx = JListAllEmpAccounts.getSelectedIndex();
+				/*if (selectedIx > -1) {
+					Departamento d = (Departamento) JListAllEmpAccounts.getModel().getElementAt(selectedIx);
 					if (d != null) {
 						try {
 							boolean exito = departamentoServicio.delete(d.getDeptno());
@@ -272,7 +292,7 @@ public class DeptWindow extends JFrame {
 							ex.printStackTrace();
 						}
 					}
-				}
+				}*/
 			}
 		};
 		btnEliminarCuenta.addActionListener(deleteListener);
@@ -314,13 +334,25 @@ public class DeptWindow extends JFrame {
 	}
 
 	private void getAllDepartamentos() {
-		List<Departamento> departamentos = departamentoServicio.getAll();
+		/*List<Departamento> departamentos = departamentoServicio.getAll();
 		addMensaje(true, "Se han recuperado: " + departamentos.size() + " departamentos");
 		DefaultListModel<Departamento> defModel = new DefaultListModel<>();
 
 		defModel.addAll(departamentos);
 
-		JListAllDepts.setModel(defModel);
+		JListAllEmpAccounts.setModel(defModel);*/
+
+	}
+	
+	//Método para mostrar las cuentas de un id pasado por parametro
+	private void getAllEmpAccounts(int id) {
+		List<Account> cuentas = empleadoServicio.getAllEmpAccounts(id);
+		addMensaje(true, "Se han recuperado: " + cuentas.size() + " cuentas");
+		DefaultListModel<Account> defModel2 = new DefaultListModel<>();
+
+		defModel2.addAll(cuentas);
+
+		JListAllEmpAccounts.setModel(defModel2);
 
 	}
 }
