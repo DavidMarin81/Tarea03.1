@@ -24,13 +24,13 @@ public class Empleado implements java.io.Serializable {
 	private BigDecimal sal;
 	private BigDecimal comm;
 	private Set<Account> accounts = new HashSet(0);
-	private Set<Empleado> suborninado = new HashSet(0);
+	private Set<Empleado> subordinados = new HashSet(0);
 
 	public Empleado() {
 	}
 
 	public Empleado(Departamento dept, Empleado jefe, String ename, String job, Date hiredate, BigDecimal sal, BigDecimal comm,
-			Set<Account> accounts, Set<Empleado> suborninado) {
+			Set<Account> accounts, Set<Empleado> subordinados) {
 		this.dept = dept;
 		this.jefe = jefe;
 		this.ename = ename;
@@ -39,7 +39,7 @@ public class Empleado implements java.io.Serializable {
 		this.sal = sal;
 		this.comm = comm;
 		this.accounts = accounts;
-		this.suborninado = suborninado;
+		this.subordinados = subordinados;
 	}
 
 	public Integer getEmpno() {
@@ -115,11 +115,11 @@ public class Empleado implements java.io.Serializable {
 	}
 
 	public Set<Empleado> getEmps() {
-		return this.suborninado;
+		return this.subordinados;
 	}
 
-	public void setEmps(Set<Empleado> suborninado) {
-		this.suborninado = suborninado;
+	public void setEmps(Set<Empleado> subordinados) {
+		this.subordinados = subordinados;
 	}
 
 	@Override
