@@ -64,7 +64,6 @@ public class Account implements java.io.Serializable {
 	}
 
 
-
 	public Set<AccMovement> getAccMovementsOrigen() {
 		return accMovementsOrigen;
 	}
@@ -76,7 +75,6 @@ public class Account implements java.io.Serializable {
 	public void setAccMovementsDest(Set<AccMovement> accMovementsDest) {
 		this.accMovementsDest = accMovementsDest;
 	}
-	
 	
 
 	@Override
