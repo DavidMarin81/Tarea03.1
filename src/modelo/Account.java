@@ -76,10 +76,12 @@ public class Account implements java.io.Serializable {
 	public void setAccMovementsDest(Set<AccMovement> accMovementsDest) {
 		this.accMovementsDest = accMovementsDest;
 	}
+	
+	
 
 	@Override
 	public String toString() {
-		return "Account [accountno=" + accountno + "]";
+		return "Account [accountno=" + accountno + ", emp=" + emp.getEmpno() + ", amount=" + amount + "]";
 	}
 	
 	
