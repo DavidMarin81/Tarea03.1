@@ -26,9 +26,11 @@ import exceptions.InstanceNotFoundException;
 import modelo.Account;
 import modelo.Departamento;
 import modelo.Empleado;
+import modelo.servicio.AccountServicio;
 import modelo.servicio.DepartamentoServicio;
 import modelo.servicio.IEmpleadoServicio;
 import modelo.servicio.EmpleadoServicio;
+import modelo.servicio.IAccountServicio;
 import modelo.servicio.IDepartamentoServicio;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -51,7 +53,7 @@ public class DeptWindow extends JFrame {
 	private JList<Account> JListAllEmpAccounts;
 
 	private IDepartamentoServicio departamentoServicio;
-	private CreateNewDeptDialog createDialog;
+	private CreateNewAccountDialog createDialog;
 	private JButton btnModificarImporteCuenta;
 	private JButton btnEliminarCuenta;
 	private JTextField txtIdEmpleado;
@@ -59,7 +61,13 @@ public class DeptWindow extends JFrame {
 	
 	//Se crea un objeto IEmpleadoServicio
 	private IEmpleadoServicio empleadoServicio;
-
+	
+	//Se crea un objeto IAccountServicio
+	private IAccountServicio accountServicio;
+	
+	//Se crea un objeto Empleado para pasar los datos al otro JFrame
+	Empleado empleadoAPasar;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -85,6 +93,9 @@ public class DeptWindow extends JFrame {
 		
 		//Se crea un objeto EmpleadoServicio
 		empleadoServicio = new EmpleadoServicio();
+		
+		//Se crea un objeto AccountServicio
+		accountServicio = new AccountServicio();
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 847, 772);
@@ -167,10 +178,13 @@ public class DeptWindow extends JFrame {
 					try {
 						idEmpIntroducido = Integer.parseInt(IdIntroducido);
 						Empleado empleado = empleadoServicio.findEmpById(idEmpIntroducido);
+						empleadoAPasar = empleado;
+						
 						//Si el empleado existe
 						if (empleado.getEmpno() == idEmpIntroducido) {
 							addMensaje(true, "El empleado " + idEmpIntroducido + " existe en la BBDD");
 						} 
+						empleadoAPasar = empleado;
 						//Si el empleado no existe, entra en el catch (InstanceNotFoundException)
 					} catch (NumberFormatException nfe) {
 
@@ -228,9 +242,11 @@ public class DeptWindow extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				JFrame owner = (JFrame) SwingUtilities.getRoot((Component) e.getSource());
-				createDialog = new CreateNewDeptDialog(owner, "Crear nuevo departamento",
-						Dialog.ModalityType.DOCUMENT_MODAL, null);
+				createDialog = new CreateNewAccountDialog(owner, "Crear nueva cuenta",
+						Dialog.ModalityType.DOCUMENT_MODAL, null, empleadoAPasar);
 				showDialog();
+				
+				
 			}
 		};
 		btnCrearNuevaCuenta.addActionListener(crearListener);
@@ -311,10 +327,28 @@ public class DeptWindow extends JFrame {
 
 	private void showDialog() {
 		createDialog.setVisible(true);
-		Departamento departamentoACrear = createDialog.getResult();
-		if (departamentoACrear != null) {
+		//Departamento departamentoACrear = createDialog.getResult();
+		Account cuentaACrear = createDialog.getResult();
+		//if (departamentoACrear != null) {
+		if (cuentaACrear != null) {
+			//saveOrUpdate(departamentoACrear);
+			saveOrUpdateCuenta(cuentaACrear);
+		}
+	}
+	
+	private void saveOrUpdateCuenta(Account cuenta) {
+		try {
+			Account nueva = accountServicio.saveOrUpdate(cuenta);
+			System.out.println("La cuenta es: " + nueva);
+			if (nueva != null) {
+				addMensaje(true, "Se ha creado una cuenta con id: " + nueva.getAccountno());
+				
+			} else {
+				addMensaje(true, "La cuenta no se ha creado/actualizado correctamente");
+			}
 
-			saveOrUpdate(departamentoACrear);
+		} catch (Exception ex) {
+			addMensaje(true, "Ha ocurrido un error y no se ha podido crear la cuenta");
 		}
 	}
 
@@ -355,4 +389,5 @@ public class DeptWindow extends JFrame {
 		JListAllEmpAccounts.setModel(defModel2);
 
 	}
+	
 }

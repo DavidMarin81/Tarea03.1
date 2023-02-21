@@ -101,4 +101,30 @@ public class AccountServicio implements IAccountServicio {
 
 	}
 
+
+
+	@Override
+	public Account saveOrUpdate(Account c) {
+		SessionFactory sessionFactory = SessionFactoryUtil.getSessionFactory();
+		Session session = sessionFactory.openSession();
+		Transaction tx = null;
+		
+		try {
+			tx = session.beginTransaction();
+
+			session.saveOrUpdate(c);
+			tx.commit();
+		} catch (Exception ex) {
+			System.out.println("Ha ocurrido una excepción en create Account: " + ex.getMessage());
+			if (tx != null) {
+				tx.rollback();
+			}
+			throw ex;
+		} finally {
+			session.close();
+		}
+		
+		return c;
+	}
+
 }

@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -14,7 +15,14 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import modelo.Account;
 import modelo.Departamento;
+import modelo.Empleado;
+import modelo.servicio.AccountServicio;
+import modelo.servicio.IAccountServicio;
+
+import java.awt.Color;
+import javax.swing.SwingConstants;
 
 public class CreateNewAccountDialog extends JDialog {
 
@@ -23,22 +31,29 @@ public class CreateNewAccountDialog extends JDialog {
 	 */
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
-	private JTextField textFieldUbicacion;
-	private JTextField textFieldNombreDept;
+	private JTextField txtImporteCuenta;
 	private JButton okButton;
 	
-	private Departamento departamentoACrearOActualizar=null;
+	//private Departamento departamentoACrearOActualizar=null;
+	private Account cuentaACrearOActualizar = null;
 	
-	public Departamento getResult() {
+	/*public Departamento getResult() {
 		return this.departamentoACrearOActualizar;
+	}*/
+	
+	public Account getResult() {
+		return this.cuentaACrearOActualizar;
 	}
-
-
-
+	
+	//Se crea un empleado para introducirle los datos que vienen del JFrame principal
+	Empleado empleadoAPasar;
+	
 	/**
 	 * Create the dialog.
 	 */
 	public void initComponents() {
+		
+		this.setTitle("Crear una cuenta");
 		
 		setBounds(100, 100, 598, 300);
 		getContentPane().setLayout(new BorderLayout());
@@ -46,27 +61,28 @@ public class CreateNewAccountDialog extends JDialog {
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 
-		JLabel lblDeptName = new JLabel("Nombre departamento");
-		lblDeptName.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblDeptName.setBounds(39, 34, 208, 24);
-		contentPanel.add(lblDeptName);
+		JLabel txtMensajeError = new JLabel("");
+		txtMensajeError.setForeground(new Color(255, 0, 0));
+		txtMensajeError.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		txtMensajeError.setBounds(39, 163, 488, 24);
+		contentPanel.add(txtMensajeError);
 
-		textFieldUbicacion = new JTextField();
-		textFieldUbicacion.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		textFieldUbicacion.setBounds(330, 83, 197, 23);
-		contentPanel.add(textFieldUbicacion);
-		textFieldUbicacion.setColumns(10);
+		txtImporteCuenta = new JTextField();
+		txtImporteCuenta.setHorizontalAlignment(SwingConstants.CENTER);
+		txtImporteCuenta.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		txtImporteCuenta.setBounds(236, 104, 197, 23);
+		contentPanel.add(txtImporteCuenta);
+		txtImporteCuenta.setColumns(10);
 
-		JLabel lblDeptLocation = new JLabel("Ubicación");
-		lblDeptLocation.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblDeptLocation.setBounds(39, 82, 140, 24);
-		contentPanel.add(lblDeptLocation);
-
-		textFieldNombreDept = new JTextField();
-		textFieldNombreDept.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		textFieldNombreDept.setColumns(10);
-		textFieldNombreDept.setBounds(330, 35, 197, 23);
-		contentPanel.add(textFieldNombreDept);
+		JLabel lblImporteCuenta = new JLabel("Importe");
+		lblImporteCuenta.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblImporteCuenta.setBounds(156, 103, 72, 24);
+		contentPanel.add(lblImporteCuenta);
+		
+		JLabel lblTitulo = new JLabel("Introduce el importe de la cuenta a crear");
+		lblTitulo.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblTitulo.setBounds(39, 35, 488, 24);
+		contentPanel.add(lblTitulo);
 
 		JPanel buttonPane = new JPanel();
 		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -81,7 +97,8 @@ public class CreateNewAccountDialog extends JDialog {
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				departamentoACrearOActualizar=null;
+				//departamentoACrearOActualizar=null;
+				cuentaACrearOActualizar = null;
 				CreateNewAccountDialog.this.dispose();
 				
 			}
@@ -92,34 +109,49 @@ public class CreateNewAccountDialog extends JDialog {
 		ActionListener crearBtnActionListener = new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-				if (!(textFieldUbicacion.getText().trim().equals(""))
-						&& !(textFieldNombreDept.getText().trim().equals(""))) {
-					if(departamentoACrearOActualizar==null) {
+				if (!(txtImporteCuenta.getText().trim().equals(""))) {
+					//if(departamentoACrearOActualizar==null) {
+					if(cuentaACrearOActualizar == null) {
 						//Solo para creación
-						departamentoACrearOActualizar= new Departamento();
+						//departamentoACrearOActualizar= new Departamento();
+						cuentaACrearOActualizar = new Account();
+						try {
+							//Se pasa el JTextField a BigDecimal
+							BigDecimal cantidad = new BigDecimal(txtImporteCuenta.getText().trim());
+
+							cuentaACrearOActualizar.setAmount(cantidad);
+							cuentaACrearOActualizar.setEmp(empleadoAPasar);
+							
+							CreateNewAccountDialog.this.dispose();
+							
+						//Entra en el catch si uno de los datos es incorrecto
+						} catch (Exception ex) {
+							ex.printStackTrace();
+							cuentaACrearOActualizar = null;
+							txtImporteCuenta.setText("");
+							txtMensajeError.setText("Datos incorrectos");
+						}
+						
 					}
-					departamentoACrearOActualizar.setDname(textFieldNombreDept.getText().trim());
-					departamentoACrearOActualizar.setLoc(textFieldUbicacion.getText().trim());
-					CreateNewAccountDialog.this.dispose();
-				}
+				} 
 			}
 		};
 
 		this.okButton.addActionListener(crearBtnActionListener);
 
 	}
-
-	public CreateNewAccountDialog(Window owner, String title, ModalityType modalityType, Departamento dept) {
+	
+	public CreateNewAccountDialog(Window owner, String title, ModalityType modalityType, Account account, Empleado empleado) {
 		super(owner, title, modalityType);
 		initComponents();
-		departamentoACrearOActualizar=dept;
-		if(departamentoACrearOActualizar!=null) {
-			textFieldNombreDept.setText(departamentoACrearOActualizar.getDname());
-			textFieldUbicacion.setText(departamentoACrearOActualizar.getLoc());
+		//departamentoACrearOActualizar=dept;
+		cuentaACrearOActualizar = account;
+		empleadoAPasar = empleado;
+		//if(departamentoACrearOActualizar!=null) {
+		if(cuentaACrearOActualizar != null) {
+			txtImporteCuenta.setText(cuentaACrearOActualizar.getAmount().toString());
 			
 		}
 		this.setLocationRelativeTo(owner);
 	}
-	
-	
 }
