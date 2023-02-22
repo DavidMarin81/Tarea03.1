@@ -56,7 +56,6 @@ public class DeptWindow extends JFrame {
 	
 	private JList<Account> JListAllEmpAccounts;
 
-	private IDepartamentoServicio departamentoServicio;
 	private CreateNewAccountDialog createDialog;
 	private UpdateAccountDialog updateDialog;
 	private JButton btnModificarImporteCuenta;
@@ -95,8 +94,6 @@ public class DeptWindow extends JFrame {
 	 */
 	public DeptWindow() {
 
-		departamentoServicio = new DepartamentoServicio();
-		
 		//Se crea un objeto EmpleadoServicio
 		empleadoServicio = new EmpleadoServicio();
 		
@@ -206,8 +203,6 @@ public class DeptWindow extends JFrame {
 								+ idEmpIntroducido);
 
 					}
-					//Se limpia el txtField
-					//txtIdEmpleado.setText("");
 				} 
 				
 			}
@@ -246,13 +241,10 @@ public class DeptWindow extends JFrame {
 		ActionListener crearListener = new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-
 				JFrame owner = (JFrame) SwingUtilities.getRoot((Component) e.getSource());
 				createDialog = new CreateNewAccountDialog(owner, "Crear nueva cuenta",
 						Dialog.ModalityType.DOCUMENT_MODAL, null, empleadoAPasar);
 				showDialog();
-				
-				
 			}
 		};
 		btnCrearNuevaCuenta.addActionListener(crearListener);
@@ -296,28 +288,28 @@ public class DeptWindow extends JFrame {
 		};
 		JListAllEmpAccounts.addListSelectionListener(selectionListListener);
 
+		//Borrar cuenta con un id
 		ActionListener deleteListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int selectedIx = JListAllEmpAccounts.getSelectedIndex();
-				/*if (selectedIx > -1) {
-					Departamento d = (Departamento) JListAllEmpAccounts.getModel().getElementAt(selectedIx);
-					if (d != null) {
+				if (selectedIx > -1) {
+					Account c = (Account) JListAllEmpAccounts.getModel().getElementAt(selectedIx);
+					if (c != null) {
 						try {
-							boolean exito = departamentoServicio.delete(d.getDeptno());
+							boolean exito = accountServicio.delete(c.getAccountno());
 							if (exito) {
-								addMensaje(true, "Se ha eliminado el dept con id: " + d.getDeptno());
-								getAllDepartamentos();
+								addMensaje(true, "Se ha eliminado la cuenta con id: " + c.getAccountno());
 							}
 						} catch (exceptions.InstanceNotFoundException e1) {
-							addMensaje(true, "No se ha podido borrar el departamento. No se ha encontrado con id: "
-									+ d.getDeptno());
+							addMensaje(true, "No se ha podido borrar la cuenta. No se ha encontrado con id: "
+									+ c.getAccountno());
 						} catch (Exception ex) {
-							addMensaje(true, "No se ha podido borrar el departamento. ");
+							addMensaje(true, "No se ha podido borrar la cuenta. ");
 							System.out.println("Exception: " + ex.getMessage());
 							ex.printStackTrace();
 						}
 					}
-				}*/
+				}
 			}
 		};
 		btnEliminarCuenta.addActionListener(deleteListener);
@@ -336,11 +328,8 @@ public class DeptWindow extends JFrame {
 
 	private void showDialog() {
 		createDialog.setVisible(true);
-		//Departamento departamentoACrear = createDialog.getResult();
 		Account cuentaACrear = createDialog.getResult();
-		//if (departamentoACrear != null) {
 		if (cuentaACrear != null) {
-			//saveOrUpdate(departamentoACrear);
 			saveOrUpdateCuenta(cuentaACrear);
 		}
 	}
@@ -353,9 +342,7 @@ public class DeptWindow extends JFrame {
 		if (cantidadACrear != null) {
 			createMovement(cuentaAModificar, cantidadACrear);
 		}
-		if (cuentaAModificar != null) {
-			saveOrUpdateCuenta(cuentaAModificar);
-		}
+		
 	}
 	
 	private void saveOrUpdateCuenta(Account cuenta) {
@@ -394,32 +381,6 @@ public class DeptWindow extends JFrame {
 		}
 	}
 
-	private void saveOrUpdate(Departamento dept) {
-		try {
-			Departamento nuevo = departamentoServicio.saveOrUpdate(dept);
-			if (nuevo != null) {
-				addMensaje(true, "Se ha creado un departamento con id: " + nuevo.getDeptno());
-				getAllDepartamentos();
-			} else {
-				addMensaje(true, " El departamento no se ha creado/actualizado correctamente");
-			}
-
-		} catch (Exception ex) {
-			addMensaje(true, "Ha ocurrido un error y no se ha podido crear el departamento");
-		}
-	}
-
-	private void getAllDepartamentos() {
-		/*List<Departamento> departamentos = departamentoServicio.getAll();
-		addMensaje(true, "Se han recuperado: " + departamentos.size() + " departamentos");
-		DefaultListModel<Departamento> defModel = new DefaultListModel<>();
-
-		defModel.addAll(departamentos);
-
-		JListAllEmpAccounts.setModel(defModel);*/
-
-	}
-	
 	//Método para mostrar las cuentas de un id pasado por parametro
 	private void getAllEmpAccounts(int id) {
 		List<Account> cuentas = empleadoServicio.getAllEmpAccounts(id);

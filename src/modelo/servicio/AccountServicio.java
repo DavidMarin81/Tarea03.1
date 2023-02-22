@@ -10,7 +10,7 @@ import org.hibernate.Transaction;
 import exceptions.SaldoInsuficienteException;
 import modelo.AccMovement;
 import modelo.Account;
-
+import modelo.Departamento;
 import exceptions.InstanceNotFoundException;
 import util.SessionFactoryUtil;
 
@@ -28,8 +28,6 @@ public class AccountServicio implements IAccountServicio {
 		session.close();
 		return account;
 	}
-
-
 
 	@Override
 	public AccMovement transferir(int accOrigen, int accDestino, double cantidad)
@@ -76,7 +74,7 @@ public class AccountServicio implements IAccountServicio {
 //					accountOrigen.getAccMovementsOrigen().add(movement);
 //					accountDestino.getAccMovementsDest().add(movement);
 
-//					session.saveOrUpdate(accountOrigen);
+					session.saveOrUpdate(accountOrigen);
 //					session.saveOrUpdate(accountDestino);
 					session.save(movement);
 
@@ -124,6 +122,37 @@ public class AccountServicio implements IAccountServicio {
 		}
 		
 		return c;
+	}
+
+	@Override
+	public boolean delete(int accountId) throws InstanceNotFoundException {
+		SessionFactory sessionFactory = SessionFactoryUtil.getSessionFactory();
+		Session session = sessionFactory.openSession();
+		Transaction tx = null;
+		boolean exito=false;
+
+		try {
+			tx = session.beginTransaction();
+			Account cuenta = session.get(Account.class, accountId);
+			if(cuenta !=null) {
+			session.remove(cuenta);
+			}
+			else {
+				throw new InstanceNotFoundException(Account.class.getName() + " id: " + accountId);
+				}
+			tx.commit();
+			exito=true;
+		} catch (Exception ex) {
+			System.out.println("Ha ocurrido una excepción en delete Account: " + ex.getMessage());
+			if (tx != null) {
+				tx.rollback();
+			}
+		
+			throw ex;
+		} finally {
+			session.close();
+		}
+		return exito;
 	}
 
 }

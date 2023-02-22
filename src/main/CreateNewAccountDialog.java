@@ -34,12 +34,7 @@ public class CreateNewAccountDialog extends JDialog {
 	private JTextField txtImporteCuenta;
 	private JButton okButton;
 	
-	//private Departamento departamentoACrearOActualizar=null;
 	private Account cuentaACrearOActualizar = null;
-	
-	/*public Departamento getResult() {
-		return this.departamentoACrearOActualizar;
-	}*/
 	
 	public Account getResult() {
 		return this.cuentaACrearOActualizar;
@@ -110,10 +105,8 @@ public class CreateNewAccountDialog extends JDialog {
 
 			public void actionPerformed(ActionEvent e) {
 				if (!(txtImporteCuenta.getText().trim().equals(""))) {
-					//if(departamentoACrearOActualizar==null) {
 					if(cuentaACrearOActualizar == null) {
 						//Solo para creación
-						//departamentoACrearOActualizar= new Departamento();
 						cuentaACrearOActualizar = new Account();
 						try {
 							//Se pasa el JTextField a BigDecimal
@@ -129,7 +122,7 @@ public class CreateNewAccountDialog extends JDialog {
 							ex.printStackTrace();
 							cuentaACrearOActualizar = null;
 							txtImporteCuenta.setText("");
-							txtMensajeError.setText("Datos incorrectos");
+							txtMensajeError.setText("Datos incorrectos. Debe introducir una cantidad numerica");
 						}
 						
 					} 
@@ -144,10 +137,8 @@ public class CreateNewAccountDialog extends JDialog {
 	public CreateNewAccountDialog(Window owner, String title, ModalityType modalityType, Account account, Empleado empleado) {
 		super(owner, title, modalityType);
 		initComponents();
-		//departamentoACrearOActualizar=dept;
 		cuentaACrearOActualizar = account;
 		empleadoAPasar = empleado;
-		//if(departamentoACrearOActualizar!=null) {
 		if(cuentaACrearOActualizar != null) {
 			txtImporteCuenta.setText(cuentaACrearOActualizar.getAmount().toString());
 			
