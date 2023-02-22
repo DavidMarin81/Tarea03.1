@@ -7,6 +7,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -15,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import modelo.AccMovement;
 import modelo.Account;
 import modelo.Departamento;
 import modelo.Empleado;
@@ -24,7 +26,7 @@ import modelo.servicio.IAccountServicio;
 import java.awt.Color;
 import javax.swing.SwingConstants;
 
-public class CreateNewAccountDialog extends JDialog {
+public class UpdateAccountDialog extends JDialog {
 
 	/**
 	 * 
@@ -33,27 +35,27 @@ public class CreateNewAccountDialog extends JDialog {
 	private final JPanel contentPanel = new JPanel();
 	private JTextField txtImporteCuenta;
 	private JButton okButton;
-	
-	//private Departamento departamentoACrearOActualizar=null;
 	private Account cuentaACrearOActualizar = null;
+	private BigDecimal cantidadIntroducida = null;
 	
-	/*public Departamento getResult() {
-		return this.departamentoACrearOActualizar;
-	}*/
 	
 	public Account getResult() {
 		return this.cuentaACrearOActualizar;
 	}
 	
-	//Se crea un Empleado para introducirle los datos que vienen del JFrame principal
-	Empleado empleadoAPasar;
+	public BigDecimal getMovResult() {
+		return this.cantidadIntroducida;
+	}
+	
+	//Se crea un Account para introducirle los datos que vienen del JFrame principal
+	Account cuentaAPasar;
 	
 	/**
 	 * Create the dialog.
 	 */
 	public void initComponents() {
 		
-		this.setTitle("Crear una cuenta");
+		this.setTitle("Modificar cuenta");
 		
 		setBounds(100, 100, 598, 300);
 		getContentPane().setLayout(new BorderLayout());
@@ -97,9 +99,8 @@ public class CreateNewAccountDialog extends JDialog {
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//departamentoACrearOActualizar=null;
 				cuentaACrearOActualizar = null;
-				CreateNewAccountDialog.this.dispose();
+				UpdateAccountDialog.this.dispose();
 				
 			}
 		});
@@ -109,50 +110,31 @@ public class CreateNewAccountDialog extends JDialog {
 		ActionListener crearBtnActionListener = new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-				if (!(txtImporteCuenta.getText().trim().equals(""))) {
-					//if(departamentoACrearOActualizar==null) {
-					if(cuentaACrearOActualizar == null) {
-						//Solo para creación
-						//departamentoACrearOActualizar= new Departamento();
-						cuentaACrearOActualizar = new Account();
-						try {
-							//Se pasa el JTextField a BigDecimal
-							BigDecimal cantidad = new BigDecimal(txtImporteCuenta.getText().trim());
-
-							cuentaACrearOActualizar.setAmount(cantidad);
-							cuentaACrearOActualizar.setEmp(empleadoAPasar);
-							
-							CreateNewAccountDialog.this.dispose();
-							
-						//Entra en el catch si uno de los datos es incorrecto
-						} catch (Exception ex) {
-							ex.printStackTrace();
-							cuentaACrearOActualizar = null;
-							txtImporteCuenta.setText("");
-							txtMensajeError.setText("Datos incorrectos");
-						}
-						
-					} 
-				} 
-			}
+				try {
+					//Se pasa el JTextField a BigDecimal
+					cantidadIntroducida = new BigDecimal(txtImporteCuenta.getText().trim());
+					
+					UpdateAccountDialog.this.dispose();
+					
+				//Entra en el catch si uno de los datos es incorrecto
+				} catch (Exception ex) {
+					ex.printStackTrace();
+					cuentaACrearOActualizar = null;
+					txtImporteCuenta.setText("");
+					txtMensajeError.setText("Datos incorrectos");
+				}
+			} 
 		};
 
 		this.okButton.addActionListener(crearBtnActionListener);
 
 	}
 	
-	public CreateNewAccountDialog(Window owner, String title, ModalityType modalityType, Account account, Empleado empleado) {
+	public UpdateAccountDialog(Window owner, String title, ModalityType modalityType, Account account) {
 		super(owner, title, modalityType);
 		initComponents();
-		//departamentoACrearOActualizar=dept;
 		cuentaACrearOActualizar = account;
-		empleadoAPasar = empleado;
-		//if(departamentoACrearOActualizar!=null) {
-		if(cuentaACrearOActualizar != null) {
-			txtImporteCuenta.setText(cuentaACrearOActualizar.getAmount().toString());
-			
-		}
+		txtImporteCuenta.setText(account.getAmount() + "");
 		this.setLocationRelativeTo(owner);
 	}
-	
 }

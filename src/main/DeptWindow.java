@@ -22,7 +22,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.hibernate.internal.build.AllowSysOut;
+
 import exceptions.InstanceNotFoundException;
+import modelo.AccMovement;
 import modelo.Account;
 import modelo.Departamento;
 import modelo.Empleado;
@@ -38,6 +41,7 @@ import javax.swing.ListModel;
 import javax.swing.SwingConstants;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.math.BigDecimal;
 
 public class DeptWindow extends JFrame {
 
@@ -54,6 +58,7 @@ public class DeptWindow extends JFrame {
 
 	private IDepartamentoServicio departamentoServicio;
 	private CreateNewAccountDialog createDialog;
+	private UpdateAccountDialog updateDialog;
 	private JButton btnModificarImporteCuenta;
 	private JButton btnEliminarCuenta;
 	private JTextField txtIdEmpleado;
@@ -65,8 +70,9 @@ public class DeptWindow extends JFrame {
 	//Se crea un objeto IAccountServicio
 	private IAccountServicio accountServicio;
 	
-	//Se crea un objeto Empleado para pasar los datos al otro JFrame
+	//Se crea un objeto Empleado y Account para pasar los datos al otro JFrame
 	Empleado empleadoAPasar;
+	Account cuentaAPasar;
 	
 	/**
 	 * Launch the application.
@@ -253,36 +259,39 @@ public class DeptWindow extends JFrame {
 
 		ActionListener modificarListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				/*int selectedIx = JListAllEmpAccounts.getSelectedIndex();
+				
+				int selectedIx = JListAllEmpAccounts.getSelectedIndex();
 				if (selectedIx > -1) {
-					Departamento departamento = (Departamento) JListAllEmpAccounts.getModel().getElementAt(selectedIx);
-					if (departamento != null) {
+					Account cuenta = (Account) JListAllEmpAccounts.getModel().getElementAt(selectedIx);
+					if (cuenta != null) {
 
 						JFrame owner = (JFrame) SwingUtilities.getRoot((Component) e.getSource());
 
-						createDialog = new CreateNewDeptDialog(owner, "Modificar departamento",
-								Dialog.ModalityType.DOCUMENT_MODAL, departamento);
-						showDialog();
+						updateDialog = new UpdateAccountDialog(owner, "Modificar cuenta",
+								Dialog.ModalityType.DOCUMENT_MODAL, cuenta);
+						showUpdateDialog();
 					}
-				}*/
+				}
 			}
 		};
 
 		btnModificarImporteCuenta.addActionListener(modificarListener);
 
+		//Para seleccionar un elemento de la JList
 		ListSelectionListener selectionListListener = new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
-				/*if (e.getValueIsAdjusting() == false) {
+				if (e.getValueIsAdjusting() == false) {
 					int selectedIx = JListAllEmpAccounts.getSelectedIndex();
 					btnModificarImporteCuenta.setEnabled((selectedIx > -1));
 					btnEliminarCuenta.setEnabled((selectedIx > -1));
 					if (selectedIx > -1) {
-						Departamento d = (Departamento) DeptWindow.this.JListAllEmpAccounts.getModel().getElementAt(selectedIx);
-						if (d != null) {
-							addMensaje(true, "Se ha seleccionado el d: " + d);
+						Account c = (Account) DeptWindow.this.JListAllEmpAccounts.getModel().getElementAt(selectedIx);
+						if (c != null) {
+							addMensaje(true, "Se ha seleccionado la cuenta: " + c);
+							cuentaAPasar = c;
 						}
 					}
-				}*/
+				}
 			}
 		};
 		JListAllEmpAccounts.addListSelectionListener(selectionListListener);
@@ -336,12 +345,24 @@ public class DeptWindow extends JFrame {
 		}
 	}
 	
+	private void showUpdateDialog() {
+		updateDialog.setVisible(true);
+		Account cuentaAModificar = updateDialog.getResult();
+		BigDecimal cantidadACrear = updateDialog.getMovResult();
+		
+		if (cantidadACrear != null) {
+			createMovement(cuentaAModificar, cantidadACrear);
+		}
+		if (cuentaAModificar != null) {
+			saveOrUpdateCuenta(cuentaAModificar);
+		}
+	}
+	
 	private void saveOrUpdateCuenta(Account cuenta) {
 		try {
 			Account nueva = accountServicio.saveOrUpdate(cuenta);
-			System.out.println("La cuenta es: " + nueva);
 			if (nueva != null) {
-				addMensaje(true, "Se ha creado una cuenta con id: " + nueva.getAccountno());
+					addMensaje(true, "Se ha creado/actualizado una cuenta con id: " + nueva.getAccountno());
 				
 			} else {
 				addMensaje(true, "La cuenta no se ha creado/actualizado correctamente");
@@ -349,6 +370,27 @@ public class DeptWindow extends JFrame {
 
 		} catch (Exception ex) {
 			addMensaje(true, "Ha ocurrido un error y no se ha podido crear la cuenta");
+		}
+	}
+	
+	private void createMovement(Account cuenta, BigDecimal cantidad) {
+		try {
+			Account nueva = accountServicio.saveOrUpdate(cuenta);
+			AccMovement movimiento = new AccMovement();
+			movimiento = 
+					accountServicio.transferir(
+							cuenta.getAccountno(),
+							cuenta.getAccountno(),
+							cantidad.doubleValue());
+			if (movimiento != null) {
+					addMensaje(true, "Se ha creado el movimiento: " + movimiento.getAccountMovId());
+				
+			} else {
+				addMensaje(true, "El movimiento no se ha creado correctamente");
+			}
+
+		} catch (Exception ex) {
+			addMensaje(true, "Ha ocurrido un error y no se ha podido crear el movimiento");
 		}
 	}
 

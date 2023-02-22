@@ -40,7 +40,6 @@ public class AccountServicio implements IAccountServicio {
 		AccMovement movement = null;
 
 		try {
-
 			if (cantidad <= 0) {
 				throw new UnsupportedOperationException();
 			}
@@ -55,17 +54,17 @@ public class AccountServicio implements IAccountServicio {
 				if (accountOrigen.getAmount().compareTo(cantidadBD) < 0) {
 					throw new SaldoInsuficienteException("No hay saldo suficiente", accountOrigen.getAmount(),
 							cantidadBD);
-				}
+				} 
 				Account accountDestino = session.get(Account.class, accDestino);
 				if (accountDestino == null) {
 					throw new InstanceNotFoundException(Account.class.getName() + " destino id:" + accDestino);
 				}
 				
 					tx = session.beginTransaction();
-
+					
 					accountOrigen.setAmount(accountOrigen.getAmount().subtract(cantidadBD));
-					accountDestino.setAmount(accountDestino.getAmount().add(cantidadBD));
-
+					//accountDestino.setAmount(accountDestino.getAmount().add(cantidadBD));
+					
 					movement = new AccMovement();
 					movement.setAmount(cantidadBD);
 					movement.setDatetime(LocalDateTime.now());
